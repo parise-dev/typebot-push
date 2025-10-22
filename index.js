@@ -8,14 +8,8 @@ import cors from "cors";
 dotenv.config();
 
 const app = express();
-app.use(cors({
-  origin: [
-    'http://localhost:4200',      // desenvolvimento Angular
-    'https://front-reds.vercel.app/', // seu domínio da Vercel
-  ],
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type'],
-}));
+app.use(cors());
+
 
 app.use(express.json());
 app.use(express.static("public"));
