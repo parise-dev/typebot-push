@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ativar Notificações</title>
+  <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-messaging-compat.js"></script>
+</head>
+<body style="font-family:sans-serif;text-align:center;margin-top:40px;">
+  <h2>🔔 Ative as notificações</h2>
+  <button id="ativar" style="padding:10px 20px;font-size:16px;">Permitir notificações</button>
+  <p id="status"></p>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD8HAQ6KGgl9azVsMR2mrwhx8eI6M0Su84",
+      authDomain: "typebot-leads-notifications.firebaseapp.com",
+      projectId: "typebot-leads-notifications",
+      storageBucket: "typebot-leads-notifications.firebasestorage.app",
+      messagingSenderId: "757091714627",
+      appId: "1:757091714627:web:adc7f3e66bc806ccfbf6f6",
+      measurementId: "G-7WW64QTMX4"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const messaging = firebase.messaging();
+
+    document.getElementById("ativar").onclick = async () => {
+      document.getElementById("status").innerText = "Solicitando permissão...";
+      try {
+        const registration = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
+        await Notification.requestPermission();
+        const token = await messaging.getToken({
+          vapidKey: "BPb3SmdTpWtbcJhelIwTgiHe8gy8EEDbX7v9H04JpI7bEF85HcMJlfOoU5dRHWHZqLFgtZ6ZD2MwBDTRxGyP0GY",
+          serviceWorkerRegistration: registration
+        });
+        document.getElementById("status").innerText = "✅ Permissão concedida!";
+        await fetch("/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token })
+        });
+      } catch (err) {
+        document.getElementById("status").innerText = "❌ Erro: " + err.message;
+      }
+    };
+  </script>
+</body>
+</html>
