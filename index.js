@@ -22,7 +22,7 @@ if (!fs.existsSync(TOKENS_FILE)) {
 
 const serviceAccount = JSON.parse(process.env.SERVICE_ACCOUNT_KEY);
 
-const PROJECT_ID = "typebot-leads-notifications"; // fixo, seu id
+const PROJECT_ID = "typebot-leads-notifications";
 const MESSAGING_SCOPE = "https://www.googleapis.com/auth/firebase.messaging";
 const FCM_ENDPOINT = `https://fcm.googleapis.com/v1/projects/${PROJECT_ID}/messages:send`;
 
@@ -40,7 +40,10 @@ async function sendNotification(token, title, body, image, click) {
       notification: { title, body, image },
       webpush: {
         fcmOptions: { link: click },
-        notification: { icon: "https://cdn-icons-png.flaticon.com/512/992/992700.png" },
+        notification: {
+          icon: "https://typebot-push.onrender.com/imagens/icon.png", // 🔔 usa seu ícone local
+          image: image || "https://typebot-push.onrender.com/imagens/icon.png", // opcional
+        },
       },
     },
   };
@@ -71,28 +74,31 @@ app.post("/register", (req, res) => {
   return res.json({ success: true, message: "Token salvo com sucesso!" });
 });
 
-// webhook do typebot
+// webhook do Typebot
 app.post("/webhook/typebot", async (req, res) => {
   try {
     const data = req.body;
     const tokens = JSON.parse(fs.readFileSync(TOKENS_FILE, "utf8"));
 
-    const title = `💬 Novo lead: ${data?.lead?.nome || "Cliente"}`;
-    const body = "Acabou de zerar o fluxo no Typebot!";
-    const image = "https://cdn-icons-png.flaticon.com/512/1087/1087927.png";
-    const click = "https://painel.seusite.com/leads";
+    const nomeCliente = data?.lead?.nome || "Cliente";
+
+    const title = "💰 Nova venda realizada!";
+    const body = `Cliente: ${nomeCliente}`;
+    const image = "https://typebot-push.onrender.com/imagens/icon.png"; // 🟢 sua imagem
+    const click = "https://painel.seusite.com/vendas";
 
     for (const token of tokens) {
       try {
         await sendNotification(token, title, body, image, click);
+        console.log(`✅ Notificação enviada para ${nomeCliente}`);
       } catch (err) {
-        console.log("Erro com token:", token, err.message);
+        console.log("❌ Erro com token:", token, err.message);
       }
     }
 
     res.send("✅ Notificações enviadas!");
   } catch (error) {
-    console.error(error.message);
+    console.error("Erro no webhook:", error.message);
     res.status(500).send("Erro ao enviar notificações.");
   }
 });
