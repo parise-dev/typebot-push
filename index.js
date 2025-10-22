@@ -13,6 +13,13 @@ app.use(express.json());
 app.use(express.static("public"));
 
 const TOKENS_FILE = "./db.json";
+
+// cria o arquivo db.json automaticamente se não existir
+if (!fs.existsSync(TOKENS_FILE)) {
+  fs.writeFileSync(TOKENS_FILE, JSON.stringify([]));
+  console.log("📁 db.json criado automaticamente!");
+}
+
 const serviceAccount = JSON.parse(process.env.SERVICE_ACCOUNT_KEY);
 
 const PROJECT_ID = "typebot-leads-notifications"; // fixo, seu id
