@@ -8,7 +8,15 @@ import cors from "cors";
 dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:4200',      // desenvolvimento Angular
+    'https://typebot-push-xaas.vercel.app', // seu domínio da Vercel
+  ],
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type'],
+}));
+
 app.use(express.json());
 app.use(express.static("public"));
 
