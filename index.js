@@ -11,7 +11,7 @@ const app = express();
 app.use(cors({
   origin: [
     'http://localhost:4200',      // desenvolvimento Angular
-    'https://typebot-push-xaas.vercel.app', // seu domínio da Vercel
+    'https://front-reds.vercel.app/', // seu domínio da Vercel
   ],
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type'],
